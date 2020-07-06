@@ -12,7 +12,7 @@ class RChart:
         self.num_iterations = 1
         self.OC_samples = {}
         self.control_limits ={}
-        self.__init_rChart(samples, L=L)
+        self.__init_rChart(samples, )
         self.finalLCL = self.get_final_control_limits()["LCL"]
         self.finalCL = self.get_final_control_limits()["CL"]
         self.finalUCL = self.get_final_control_limits()["UCL"]
@@ -43,41 +43,41 @@ class RChart:
     def add_phase2_samples(self, samples):
         self.phase2_samples = samples
     
-    def __rChart(self, samples, L = 3):
+    def __rChart(self, samples):
         n = len(samples[0])
         range_samples = np.ptp(samples, axis=1) 
-        lcl, cl, ucl = self.__getLimits(n, range_samples, L=L) 
+        lcl, cl, ucl = self.__getLimits(n, range_samples) 
         plot(range_samples, lcl, cl, ucl, title=self.title)
-        self.__checkWithinLimits(range_samples, lcl, cl, ucl, L=L, n=n)
+        self.__checkWithinLimits(range_samples, lcl, cl, ucl, n=n)
 
-    def __init_rChart(self, samples, L = 3):
+    def __init_rChart(self, samples):
         n = len(samples[0])
         range_samples = np.ptp(samples, axis=1) 
-        lcl, cl, ucl = self.__getLimits(n, range_samples, L=L) 
-        self.__init_checkWithinLimits(range_samples, lcl, cl, ucl, L=L, n=n)
+        lcl, cl, ucl = self.__getLimits(n, range_samples) 
+        self.__init_checkWithinLimits(range_samples, lcl, cl, ucl, n=n)
 
-    def __checkWithinLimits(self, samples, lcl, cl, ucl, n, L = 3):
+    def __checkWithinLimits(self, samples, lcl, cl, ucl, n):
         updated_samples = samples[(samples > lcl) & (samples < ucl)]
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
-        lcl, cl, ucl = self.__getLimits(n, updated_samples, L=L)
+        lcl, cl, ucl = self.__getLimits(n, updated_samples)
         if len(updated_samples) != len(samples):
             plot(updated_samples, lcl, cl, ucl, title=self.title)
-            self.__checkWithinLimits(updated_samples, lcl, cl, ucl, n, L=L)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl, n)
             
-    def __init_checkWithinLimits(self, samples, lcl, cl, ucl, n, L = 3):
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl, n):
         updated_samples = samples[(samples > lcl) & (samples < ucl)]
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
-        lcl, cl, ucl = self.__getLimits(n, updated_samples, L=L)
+        lcl, cl, ucl = self.__getLimits(n, updated_samples)
         self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
         if len(updated_samples) != len(samples):
             self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
             self.num_iterations += 1
-            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl, n, L=L)
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl, n)
 
-    def __getLimits(self, n, range_samples, L = 3):
+    def __getLimits(self, n, range_samples):
         rBar = np.mean(range_samples)
-        D3 = getD3(n, L)
-        D4 = getD4(n, L)
+        D3 = getD3(n, self.L)
+        D4 = getD4(n, self.L)
         return D3 * rBar, rBar, D4 * rBar 
 
 class SChart:
@@ -88,7 +88,7 @@ class SChart:
         self.num_iterations = 1
         self.OC_samples = {}
         self.control_limits ={}
-        self.__init_sChart(samples, L=L)
+        self.__init_sChart(samples)
         self.finalLCL = self.get_final_control_limits()["LCL"]
         self.finalCL = self.get_final_control_limits()["CL"]
         self.finalUCL = self.get_final_control_limits()["UCL"]
@@ -119,51 +119,51 @@ class SChart:
     def add_phase2_samples(self, samples):
         self.phase2_samples = samples
     
-    def __sChart(self, samples, L = 3):
+    def __sChart(self, samples):
         n = len(samples[0])
         std_samples = np.std(samples, axis=1)
-        lcl, cl, ucl = self.__getLimits(n, std_samples, L=L) 
+        lcl, cl, ucl = self.__getLimits(n, std_samples) 
         plot(std_samples, lcl, cl, ucl, title=self.title)
-        self.__checkWithinLimits(std_samples, lcl, cl, ucl, L=L, n=n)
+        self.__checkWithinLimits(std_samples, lcl, cl, ucl, n=n)
 
-    def __init_sChart(self, samples, L = 3):
+    def __init_sChart(self, samples):
         n = len(samples[0])
         std_samples = np.std(samples, axis=1)
-        lcl, cl, ucl = self.__getLimits(n, std_samples, L=L) 
-        self.__init_checkWithinLimits(std_samples, lcl, cl, ucl, L=L, n=n)
+        lcl, cl, ucl = self.__getLimits(n, std_samples) 
+        self.__init_checkWithinLimits(std_samples, lcl, cl, ucl, n=n)
 
-    def __checkWithinLimits(self, samples, lcl, cl, ucl, n, L = 3):
+    def __checkWithinLimits(self, samples, lcl, cl, ucl, n):
         updated_samples = samples[(samples > lcl) & (samples < ucl)]
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
-        lcl, cl, ucl = self.__getLimits(n, updated_samples, L=L)
+        lcl, cl, ucl = self.__getLimits(n, updated_samples)
         if len(updated_samples) != len(samples):
             plot(updated_samples, lcl, cl, ucl, title=self.title)
-            self.__checkWithinLimits(updated_samples, lcl, cl, ucl, n, L=L)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl, n)
             
-    def __init_checkWithinLimits(self, samples, lcl, cl, ucl, n, L = 3):
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl, n):
         updated_samples = samples[(samples > lcl) & (samples < ucl)]
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
-        lcl, cl, ucl = self.__getLimits(n, updated_samples, L=L)
+        lcl, cl, ucl = self.__getLimits(n, updated_samples)
         self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
         if len(updated_samples) != len(samples):
             self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
             self.num_iterations += 1
-            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl, n, L=L)
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl, n)
 
-    def __getLimits(self, n, std_samples, L = 3):
+    def __getLimits(self, n, std_samples):
         sBar = np.mean(std_samples)
-        B3 = getB3(n, L)
-        B4 = getB4(n, L)
+        B3 = getB3(n, self.L)
+        B4 = getB4(n, self.L)
         return B3 * sBar, sBar, B4 * sBar
 
 class XBarChart:
     def __init__(self, samples, L=3, variation_type="Range", title="Xbar Chart"):
         self.variation_type = variation_type
         if self.variation_type == "Range":
-            r = RChart(samples, L=L)
+            r = RChart(samples)
             self.std = r.finalCL
         else:
-            s = SChart(samples, L=L)
+            s = SChart(samples)
             self.std = s.finalCL
         self.samples = samples
         self.L = L
@@ -171,7 +171,7 @@ class XBarChart:
         self.num_iterations = 1
         self.OC_samples = {}
         self.control_limits ={}
-        self.__init_xBarChart(samples, L=L)
+        self.__init_xBarChart(samples)
         self.finalLCL = self.get_final_control_limits()["LCL"]
         self.finalCL = self.get_final_control_limits()["CL"]
         self.finalUCL = self.get_final_control_limits()["UCL"]
@@ -202,58 +202,345 @@ class XBarChart:
     def add_phase2_samples(self, samples):
         self.phase2_samples = samples
     
-    def __xBarChart(self, samples, L = 3):
+    def __xBarChart(self, samples):
         n = len(samples[0])
         mean_samples = np.mean(samples, axis=1)
-        lcl, cl, ucl = self.__getLimits(n, mean_samples, L=L) 
+        lcl, cl, ucl = self.__getLimits(n, mean_samples) 
         plot(mean_samples, lcl, cl, ucl, title=self.title)
-        self.__checkWithinLimits(mean_samples, lcl, cl, ucl, L=L, n=n)
+        self.__checkWithinLimits(mean_samples, lcl, cl, ucl, n=n)
 
-    def __init_xBarChart(self, samples, L = 3):
+    def __init_xBarChart(self, samples):
         n = len(samples[0])
         mean_samples = np.mean(samples, axis=1)
-        lcl, cl, ucl = self.__getLimits(n, mean_samples, L=L) 
-        self.__init_checkWithinLimits(mean_samples, lcl, cl, ucl, L=L, n=n)
+        lcl, cl, ucl = self.__getLimits(n, mean_samples) 
+        self.__init_checkWithinLimits(mean_samples, lcl, cl, ucl, n=n)
 
-    def __checkWithinLimits(self, samples, lcl, cl, ucl, n, L = 3):
+    def __checkWithinLimits(self, samples, lcl, cl, ucl, n):
         updated_samples = samples[(samples > lcl) & (samples < ucl)]
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
-        lcl, cl, ucl = self.__getLimits(n, updated_samples, L=L)
+        lcl, cl, ucl = self.__getLimits(n, updated_samples)
         if len(updated_samples) != len(samples):
             plot(updated_samples, lcl, cl, ucl, title=self.title)
-            self.__checkWithinLimits(updated_samples, lcl, cl, ucl, n, L=L)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl, n)
             
-    def __init_checkWithinLimits(self, samples, lcl, cl, ucl, n, L = 3):
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl, n):
         updated_samples = samples[(samples > lcl) & (samples < ucl)]
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
-        lcl, cl, ucl = self.__getLimits(n, updated_samples, L=L)
+        lcl, cl, ucl = self.__getLimits(n, updated_samples)
         self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
         if len(updated_samples) != len(samples):
             self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
             self.num_iterations += 1
-            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl, n, L=L)
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl, n)
 
-    def __getLimits(self, n, mean_samples, L = 3):
+    def __getLimits(self, n, mean_samples):
         xDoubleBar = np.mean(mean_samples)
         if self.variation_type == "Range":
-            A2 = getA2(n, L)
+            A2 = getA2(n, self.L)
             return xDoubleBar - A2 * self.std, xDoubleBar, xDoubleBar + A2 * self.std
         else:
-            A3 = getA3(n, L)
+            A3 = getA3(n, self.L)
             return xDoubleBar - A3 * self.std, xDoubleBar, xDoubleBar + A3 * self.std
+
+class pChart:
+    def __init__(self, samples, n, L=3, title="P Chart"):
+        self.samples = samples
+        self.n = n
+        self.L = L
+        self.title = title
+        self.num_iterations = 1
+        self.OC_samples = {}
+        self.control_limits ={}
+        self.__init_pChart(samples)
+        self.finalLCL = self.get_final_control_limits()["LCL"]
+        self.finalCL = self.get_final_control_limits()["CL"]
+        self.finalUCL = self.get_final_control_limits()["UCL"]
+        self.phase2_samples = []
+
+    def show_charts(self):
+        self.__pChart(self.samples, L=self.L, title=self.title)
+    
+    def show_phase2_chart(self):
+        p_samples = self.phase2_samples/self.n
+        plot(p_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
+
+    def get_num_iterations(self):
+        return self.num_iterations
+    
+    def get_oc_samples(self):
+        return self.OC_samples
+
+    def get_control_limits(self):
+        return self.control_limits
+    
+    def get_final_control_limits(self):
+        return self.control_limits[f"Iteration {self.num_iterations}"]
+
+    def summary(self):
+        return f"Iterations: {self.num_iterations}\nControl Limits: {self.control_limits}\nOC Samples: {self.OC_samples}"
+    
+    def add_phase2_samples(self, samples):
+        self.phase2_samples = samples
+    
+    def __pChart(self, samples):
+        p_samples = samples/self.n
+        lcl, cl, ucl = self.__getLimits(p_samples) 
+        plot(p_samples, lcl, cl, ucl, title=self.title)
+        self.__checkWithinLimits(p_samples, lcl, cl, ucl)
+
+    def __init_pChart(self, samples):
+        p_samples = samples/self.n 
+        lcl, cl, ucl = self.__getLimits(p_samples) 
+        self.__init_checkWithinLimits(p_samples, lcl, cl, ucl)
+
+    def __checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        if len(updated_samples) != len(samples):
+            plot(updated_samples, lcl, cl, ucl, title=self.title)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl)
             
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
+        if len(updated_samples) != len(samples):
+            self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
+            self.num_iterations += 1
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl)
 
+    def __getLimits(self, p_samples):
+        pBar = np.mean(p_samples)
+        cl = pBar
+        lcl = max(0, pBar - self.L * sqrt(pBar*(1-pBar)/self.n))
+        ucl = pBar + self.L * sqrt(pBar*(1-pBar)/self.n) 
+        return lcl, cl, ucl
 
+class npChart:
+    def __init__(self, samples, n, L=3, title="NP Chart"):
+        self.samples = samples
+        self.n = n
+        self.L = L
+        self.title = title
+        self.num_iterations = 1
+        self.OC_samples = {}
+        self.control_limits ={}
+        self.__init_pChart(samples)
+        self.finalLCL = self.get_final_control_limits()["LCL"]
+        self.finalCL = self.get_final_control_limits()["CL"]
+        self.finalUCL = self.get_final_control_limits()["UCL"]
+        self.phase2_samples = []
 
+    def show_charts(self):
+        self.__npChart(self.samples, L=self.L, title=self.title)
+    
+    def show_phase2_chart(self):
+        plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
+
+    def get_num_iterations(self):
+        return self.num_iterations
+    
+    def get_oc_samples(self):
+        return self.OC_samples
+
+    def get_control_limits(self):
+        return self.control_limits
+    
+    def get_final_control_limits(self):
+        return self.control_limits[f"Iteration {self.num_iterations}"]
+
+    def summary(self):
+        return f"Iterations: {self.num_iterations}\nControl Limits: {self.control_limits}\nOC Samples: {self.OC_samples}"
+    
+    def add_phase2_samples(self, samples):
+        self.phase2_samples = samples
+    
+    def __npChart(self, samples):
+        p_samples = samples/self.n
+        lcl, cl, ucl = self.__getLimits(p_samples) 
+        plot(n * p_samples, lcl, cl, ucl, title=self.title)
+        self.__checkWithinLimits(p_samples, lcl, cl, ucl)
+
+    def __init_npChart(self, samples):
+        p_samples = samples/self.n
+        lcl, cl, ucl = self.__getLimits(p_samples) 
+        self.__init_checkWithinLimits(p_samples, lcl, cl, ucl)
+
+    def __checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        if len(updated_samples) != len(samples):
+            plot(n * updated_samples, lcl, cl, ucl, title=self.title)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl)
+            
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
+        if len(updated_samples) != len(samples):
+            self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
+            self.num_iterations += 1
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl)
+
+    def __getLimits(self, p_samples):
+        pBar = np.mean(p_samples)
+        cl = n * pBar
+        lcl = max(0, n * pBar - self.L * sqrt(n * pBar * (1 - pBar)))
+        ucl = n * pBar + self.L * sqrt(n * pBar * (1 - pBar)) 
+        return lcl, cl, ucl
+
+class cChart:
+    def __init__(self, samples, n, L=3, title="C Chart"):
+        self.samples = samples
+        self.n = n
+        self.L = L
+        self.title = title
+        self.num_iterations = 1
+        self.OC_samples = {}
+        self.control_limits ={}
+        self.__init_pChart(samples)
+        self.finalLCL = self.get_final_control_limits()["LCL"]
+        self.finalCL = self.get_final_control_limits()["CL"]
+        self.finalUCL = self.get_final_control_limits()["UCL"]
+        self.phase2_samples = []
+
+    def show_charts(self):
+        self.__cChart(self.samples, L=self.L, title=self.title)
+    
+    def show_phase2_chart(self):
+        plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
+
+    def get_num_iterations(self):
+        return self.num_iterations
+    
+    def get_oc_samples(self):
+        return self.OC_samples
+
+    def get_control_limits(self):
+        return self.control_limits
+    
+    def get_final_control_limits(self):
+        return self.control_limits[f"Iteration {self.num_iterations}"]
+
+    def summary(self):
+        return f"Iterations: {self.num_iterations}\nControl Limits: {self.control_limits}\nOC Samples: {self.OC_samples}"
+    
+    def add_phase2_samples(self, samples):
+        self.phase2_samples = samples
+    
+    def __cChart(self, samples):
+        lcl, cl, ucl = self.__getLimits(samples) 
+        plot(samples, lcl, cl, ucl, title=self.title)
+        self.__checkWithinLimits(samples, lcl, cl, ucl)
+
+    def __init_cChart(self, samples):
+        lcl, cl, ucl = self.__getLimits(samples) 
+        self.__init_checkWithinLimits(samples, lcl, cl, ucl)
+
+    def __checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        if len(updated_samples) != len(samples):
+            plot(updated_samples, lcl, cl, ucl, title=self.title)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl)
+            
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
+        if len(updated_samples) != len(samples):
+            self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
+            self.num_iterations += 1
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl)
+
+    def __getLimits(self, c_samples):
+        cBar = np.mean(c_samples) 
+        cl = cBar
+        lcl = max(0, cBar - self.L * sqrt(c))
+        ucl = cBar + self.L * sqrt(c)
+        return lcl, cl, ucl
+    
+class cChart:
+    def __init__(self, samples, n, L=3, title="U Chart"):
+        self.samples = samples
+        self.n = n
+        self.L = L
+        self.title = title
+        self.num_iterations = 1
+        self.OC_samples = {}
+        self.control_limits ={}
+        self.__init_pChart(samples)
+        self.finalLCL = self.get_final_control_limits()["LCL"]
+        self.finalCL = self.get_final_control_limits()["CL"]
+        self.finalUCL = self.get_final_control_limits()["UCL"]
+        self.phase2_samples = []
+
+    def show_charts(self):
+        self.__cChart(self.samples, L=self.L, title=self.title)
+    
+    def show_phase2_chart(self):
+        plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
+
+    def get_num_iterations(self):
+        return self.num_iterations
+    
+    def get_oc_samples(self):
+        return self.OC_samples
+
+    def get_control_limits(self):
+        return self.control_limits
+    
+    def get_final_control_limits(self):
+        return self.control_limits[f"Iteration {self.num_iterations}"]
+
+    def summary(self):
+        return f"Iterations: {self.num_iterations}\nControl Limits: {self.control_limits}\nOC Samples: {self.OC_samples}"
+    
+    def add_phase2_samples(self, samples):
+        self.phase2_samples = samples
+    
+    def __uChart(self, samples):
+        lcl, cl, ucl = self.__getLimits(samples) 
+        plot(n * samples, lcl, cl, ucl, title=self.title)
+        self.__checkWithinLimits(samples, lcl, cl, ucl)
+
+    def __init_uChart(self, samples):
+        lcl, cl, ucl = self.__getLimits(samples) 
+        self.__init_checkWithinLimits(samples, lcl, cl, ucl)
+
+    def __checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        if len(updated_samples) != len(samples):
+            plot(n * updated_samples, lcl, cl, ucl, title=self.title)
+            self.__checkWithinLimits(updated_samples, lcl, cl, ucl)
+            
+    def __init_checkWithinLimits(self, samples, lcl, cl, ucl):
+        updated_samples = samples[(samples > lcl) & (samples < ucl)]
+        OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
+        lcl, cl, ucl = self.__getLimits(updated_samples)
+        self.control_limits[f"Iteration {self.num_iterations}"] = {"LCL": lcl, "CL": cl, "UCL": ucl} 
+        if len(updated_samples) != len(samples):
+            self.OC_samples[f"Iteration {self.num_iterations}"] = OC_samples
+            self.num_iterations += 1
+            self.__init_checkWithinLimits(updated_samples, lcl, cl, ucl)
+
+    def __getLimits(self, c_samples):
+        cBar = np.mean(c_samples) 
+        cl = n * cBar
+        lcl = max(0, n * cBar - self.L * sqrt(n * c))
+        ucl = n * cBar + self.L * sqrt(n * c)
+        return lcl, cl, ucl
 
 def general(samples, lcl, cl, ucl, title = None):
     plot(samples, lcl, cl, ucl, title=title)
-    checkWithinLimits(samples, lcl, cl, ucl, title=title)
-
-def xbarChart(samples, L = 3, title = None):
-    lcl, ucl, cl = getXbarLimits(samples, L=L)
-    plot(samples, lcl, cl, ucl, title=title)
-    checkWithinLimitsXbar(samples, lcl, cl, ucl, L=L, title=title)
 
 def plot(samples, lcl, cl, ucl, title = None):
     plt.axhline(lcl, color='black', label=f'LCL: {round(lcl, 4)}')
@@ -263,24 +550,3 @@ def plot(samples, lcl, cl, ucl, title = None):
     plt.legend()
     plt.title(title)
     plt.show()
-    
-def checkWithinLimits(samples, lcl, cl, ucl, title = None):
-    updated_samples = samples[(samples > lcl) & (samples < ucl)]
-    if len(updated_samples) != len(samples):
-        plot(updated_samples, lcl, cl, ucl, title=f"Updated {title}")
-        checkWithinLimits(updated_samples, lcl, cl, ucl, title=title)
-
-def checkWithinLimitsXbar(samples, lcl, cl, ucl, L = 3, title = None):
-    updated_samples = samples[(samples > lcl) & (samples < ucl)]
-    lcl, cl, ucl = getXbarLimits(updated_samples, L=L)
-    if len(updated_samples) != len(samples):
-        plot(updated_samples, lcl, cl, ucl, title=f"Updated {title}")
-        checkWithinLimitsXbar(updated_samples, lcl, cl, ucl, L=L, title=title)
-
-def getXbarLimits(samples, L = 3):
-    n = len(samples)
-    sigma = np.std(samples)
-    cl = np.mean(samples)
-    lcl = cl - L * sigma / sqrt(n)
-    ucl = cl + L * sigma / sqrt(n)
-    return (lcl, cl, ucl)
