@@ -466,7 +466,7 @@ class cChart:
         ucl = cBar + self.L * sqrt(c)
         return lcl, cl, ucl
     
-class cChart:
+class uChart:
     def __init__(self, samples, n, L=3, title="U Chart"):
         self.samples = samples
         self.n = n
