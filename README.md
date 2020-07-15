@@ -24,3 +24,7 @@ Basic Methods for control charts
 * get_num_iterations()
 * get_oc_samples()
 * get_final_control_limits()
+
+Initialization
+* required parameter (samples)
+* optional parameters: L (default to 3), title
