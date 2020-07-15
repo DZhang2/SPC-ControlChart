@@ -14,3 +14,13 @@ Charts included
 All charts include phase I and II capabilities for plotting and summary analysis for phase I
 
 Iterative approach for handling OC samples during phase I by removing OC samples and recalculating control limits recursively until all samples are IC
+
+Basic Methods for control charts
+
+* summary()
+* show_charts()
+* show_phase2_chart()
+* add_phase2_samples(samples)
+* get_num_iterations()
+* get_oc_samples()
+* get_final_control_limits()
