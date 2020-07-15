@@ -95,10 +95,10 @@ class SChart:
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__sChart(self.samples, L=self.L)
+        self.__sChart(self.samples)
     
     def show_phase2_chart(self):
-        std_samples = np.std(self.phase2_samples, axis=1)
+        std_samples = np.std(self.phase2_samples, ddof=1, axis=1)
         plot(std_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
 
     def get_num_iterations(self):
@@ -121,14 +121,14 @@ class SChart:
     
     def __sChart(self, samples):
         n = len(samples[0])
-        std_samples = np.std(samples, axis=1)
+        std_samples = np.std(samples, ddof=1, axis=1)
         lcl, cl, ucl = self.__getLimits(n, std_samples) 
         plot(std_samples, lcl, cl, ucl, title=self.title)
         self.__checkWithinLimits(std_samples, lcl, cl, ucl, n=n)
 
     def __init_sChart(self, samples):
         n = len(samples[0])
-        std_samples = np.std(samples, axis=1)
+        std_samples = np.std(samples, ddof=1, axis=1)
         lcl, cl, ucl = self.__getLimits(n, std_samples) 
         self.__init_checkWithinLimits(std_samples, lcl, cl, ucl, n=n)
 
