@@ -5,7 +5,7 @@ from math import sqrt
 
 #vss, fix SChart
 class RChart:
-    def __init__(self, samples, L=3, title="R Chart"):
+    def __init__(self, samples, L=3, title="r chart"):
         self.samples = samples
         self.L = L
         self.title = title
@@ -19,7 +19,7 @@ class RChart:
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__rChart(self.samples, L=self.L, title=self.title)
+        self.__rChart(self.samples)
     
     def show_phase2_chart(self):
         range_samples = np.ptp(self.phase2_samples, axis=1)
@@ -178,7 +178,7 @@ class XBarChart:
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__xBarChart(self.samples, L=self.L)
+        self.__xBarChart(self.samples)
     
     def show_phase2_chart(self):
         mean_samples = np.mean(self.phase2_samples, axis=1)
