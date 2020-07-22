@@ -3,9 +3,9 @@ import numpy as np
 from control_factors import *
 from math import sqrt
 
-#vss, fix SChart
-class RChart:
-    def __init__(self, samples, L=3, title="r chart"):
+#vss, fix summary
+class rChart:
+    def __init__(self, samples, L=3, title="R chart"):
         self.samples = samples
         self.L = L
         self.title = title
@@ -16,6 +16,7 @@ class RChart:
         self.finalLCL = self.get_final_control_limits()["LCL"]
         self.finalCL = self.get_final_control_limits()["CL"]
         self.finalUCL = self.get_final_control_limits()["UCL"]
+        plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
         self.phase2_samples = []
 
     def show_charts(self):
@@ -80,7 +81,7 @@ class RChart:
         D4 = getD4(n, self.L)
         return D3 * rBar, rBar, D4 * rBar 
 
-class SChart:
+class sChart:
     def __init__(self, samples, L=3, title="S Chart"):
         self.samples = samples
         self.L = L
@@ -156,7 +157,7 @@ class SChart:
         B4 = getB4(n, self.L)
         return B3 * sBar, sBar, B4 * sBar
 
-class XBarChart:
+class xBarChart:
     def __init__(self, samples, L=3, variation_type="Range", title="Xbar Chart"):
         self.variation_type = variation_type
         if self.variation_type == "Range":
@@ -258,7 +259,7 @@ class pChart:
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__pChart(self.samples, L=self.L, title=self.title)
+        self.__pChart(self.samples)
     
     def show_phase2_chart(self):
         p_samples = self.phase2_samples/self.n
@@ -327,14 +328,14 @@ class npChart:
         self.num_iterations = 1
         self.OC_samples = {}
         self.control_limits ={}
-        self.__init_pChart(samples)
+        self.__init_npChart(samples)
         self.finalLCL = self.get_final_control_limits()["LCL"]
         self.finalCL = self.get_final_control_limits()["CL"]
         self.finalUCL = self.get_final_control_limits()["UCL"]
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__npChart(self.samples, L=self.L, title=self.title)
+        self.__npChart(self.samples)
     
     def show_phase2_chart(self):
         plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
@@ -360,7 +361,7 @@ class npChart:
     def __npChart(self, samples):
         p_samples = samples/self.n
         lcl, cl, ucl = self.__getLimits(p_samples) 
-        plot(n * p_samples, lcl, cl, ucl, title=self.title)
+        plot(self.n * p_samples, lcl, cl, ucl, title=self.title)
         self.__checkWithinLimits(p_samples, lcl, cl, ucl)
 
     def __init_npChart(self, samples):
@@ -373,7 +374,7 @@ class npChart:
         OC_samples = samples[(samples <= lcl) | (samples >= ucl)]
         lcl, cl, ucl = self.__getLimits(updated_samples)
         if len(updated_samples) != len(samples):
-            plot(n * updated_samples, lcl, cl, ucl, title=self.title)
+            plot(self.n * updated_samples, lcl, cl, ucl, title=self.title)
             self.__checkWithinLimits(updated_samples, lcl, cl, ucl)
             
     def __init_checkWithinLimits(self, samples, lcl, cl, ucl):
@@ -388,9 +389,9 @@ class npChart:
 
     def __getLimits(self, p_samples):
         pBar = np.mean(p_samples)
-        cl = n * pBar
-        lcl = max(0, n * pBar - self.L * sqrt(n * pBar * (1 - pBar)))
-        ucl = n * pBar + self.L * sqrt(n * pBar * (1 - pBar)) 
+        cl = self.n * pBar
+        lcl = max(0, self.n * pBar - self.L * sqrt(self.n * pBar * (1 - pBar)))
+        ucl = self.n * pBar + self.L * sqrt(self.n * pBar * (1 - pBar)) 
         return lcl, cl, ucl
 
 class cChart:
@@ -402,14 +403,14 @@ class cChart:
         self.num_iterations = 1
         self.OC_samples = {}
         self.control_limits ={}
-        self.__init_pChart(samples)
+        self.__init_cChart(samples)
         self.finalLCL = self.get_final_control_limits()["LCL"]
         self.finalCL = self.get_final_control_limits()["CL"]
         self.finalUCL = self.get_final_control_limits()["UCL"]
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__cChart(self.samples, L=self.L, title=self.title)
+        self.__cChart(self.samples)
     
     def show_phase2_chart(self):
         plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
@@ -462,8 +463,8 @@ class cChart:
     def __getLimits(self, c_samples):
         cBar = np.mean(c_samples) 
         cl = cBar
-        lcl = max(0, cBar - self.L * sqrt(c))
-        ucl = cBar + self.L * sqrt(c)
+        lcl = max(0, cBar - self.L * sqrt(cBar))
+        ucl = cBar + self.L * sqrt(cBar)
         return lcl, cl, ucl
     
 class uChart:
@@ -482,7 +483,7 @@ class uChart:
         self.phase2_samples = []
 
     def show_charts(self):
-        self.__cChart(self.samples, L=self.L, title=self.title)
+        self.__cChart(self.samples)
     
     def show_phase2_chart(self):
         plot(self.phase2_samples, self.finalLCL, self.finalCL, self.finalUCL, title=self.title)
@@ -534,9 +535,9 @@ class uChart:
 
     def __getLimits(self, c_samples):
         cBar = np.mean(c_samples) 
-        cl = n * cBar
-        lcl = max(0, n * cBar - self.L * sqrt(n * c))
-        ucl = n * cBar + self.L * sqrt(n * c)
+        cl = self.n * cBar
+        lcl = max(0, self.n * cBar - self.L * sqrt(self.n * c))
+        ucl = self.n * cBar + self.L * sqrt(self.n * c)
         return lcl, cl, ucl
 
 def general(samples, lcl, cl, ucl, title = None):
